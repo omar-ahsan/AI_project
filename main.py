@@ -21,7 +21,7 @@ ui.informed_search_label.setVisible(False)
 ui.informed_node_input.setVisible(False)
 ui.informed_node_label.setVisible(False)
 
-
+#Function to update visibility of some elements
 def update_options_visibility(state):
 
     # For Uninformed
@@ -54,6 +54,11 @@ def update_options_visibility(state):
 
 ui.uninformed_check.stateChanged.connect(update_options_visibility)
 ui.informed_check.stateChanged.connect(update_options_visibility)
+
+#Function for Inputs
+def add_node():
+    node1 = ui.node_1_input.text()
+    node2 = ui.node_2_input.text()
 
 
 main_window.show()
