@@ -705,9 +705,9 @@ class Ui_MainWindow(object):
         self.informed_search_label = QtWidgets.QLabel(parent=self.mainwindow)
         self.informed_search_label.setGeometry(QtCore.QRect(220, 480, 71, 17))
         self.informed_search_label.setObjectName("informed_search_label")
-        self.Uninformed_search_label = QtWidgets.QLabel(parent=self.mainwindow)
-        self.Uninformed_search_label.setGeometry(QtCore.QRect(40, 300, 71, 17))
-        self.Uninformed_search_label.setObjectName("Uninformed_search_label")
+        self.uninformed_search_label = QtWidgets.QLabel(parent=self.mainwindow)
+        self.uninformed_search_label.setGeometry(QtCore.QRect(40, 300, 71, 17))
+        self.uninformed_search_label.setObjectName("Uninformed_search_label")
         self.direction_combo = QtWidgets.QComboBox(parent=self.mainwindow)
         self.direction_combo.setGeometry(QtCore.QRect(360, 50, 131, 25))
         self.direction_combo.setObjectName("direction_combo")
@@ -719,7 +719,7 @@ class Ui_MainWindow(object):
         MainWindow.setCentralWidget(self.mainwindow)
 
         self.retranslateUi(MainWindow)
-        self.uninformed_check.stateChanged['int'].connect(self.Uninformed_search_label.show) # type: ignore
+        self.uninformed_check.stateChanged['int'].connect(self.uninformed_search_label.show) # type: ignore
         self.uninformed_check.stateChanged['int'].connect(self.uninformed_combo.show) # type: ignore
         QtCore.QMetaObject.connectSlotsByName(MainWindow)
 
@@ -750,7 +750,7 @@ class Ui_MainWindow(object):
         self.uninformed_combo.setItemText(4, _translate("MainWindow", "Uniform Cost Search"))
         self.uninformed_combo.setItemText(5, _translate("MainWindow", "Bidirectional Search"))
         self.informed_search_label.setText(_translate("MainWindow", "Search Type"))
-        self.Uninformed_search_label.setText(_translate("MainWindow", "Search Type"))
+        self.uninformed_search_label.setText(_translate("MainWindow", "Search Type"))
         self.direction_combo.setItemText(0, _translate("MainWindow", "Undirected Graph"))
         self.direction_combo.setItemText(1, _translate("MainWindow", "Directed Graph"))
         self.direction_label.setText(_translate("MainWindow", "Direction"))
