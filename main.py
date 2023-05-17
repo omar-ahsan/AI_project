@@ -28,10 +28,12 @@ def update_options_visibility():
     if ui.uninformed_check.isChecked():
         ui.uninformed_search_label.setVisible(True)
         ui.uninformed_combo.setVisible(True)
+        
 
     elif ui.uninformed_check.isCheckable(): 
         ui.uninformed_search_label.setVisible(False)
         ui.uninformed_combo.setVisible(False)
+        
 
     # For Informed
     if ui.informed_check.isChecked():
@@ -42,6 +44,7 @@ def update_options_visibility():
         ui.informed_search_label.setVisible(True)
         ui.informed_node_input.setVisible(True)
         ui.informed_node_label.setVisible(True)
+        
 
     elif ui.informed_check.isCheckable():
         ui.informed_combo.setVisible(False)
@@ -51,7 +54,19 @@ def update_options_visibility():
         ui.informed_search_label.setVisible(False)
         ui.informed_node_input.setVisible(False)
         ui.informed_node_label.setVisible(False)
+        
+# For handling the check state in reference to another for the search type
+def handle_uninformed_check():
+    ui.uninformed_check.setChecked(True)
+    ui.informed_check.setChecked(False)
 
+def handle_informed_check():
+    ui.uninformed_check.setChecked(False)
+    ui.informed_check.setChecked(True)
+
+
+ui.uninformed_check.clicked.connect(handle_uninformed_check)
+ui.informed_check.clicked.connect(handle_informed_check)
 ui.uninformed_check.stateChanged.connect(update_options_visibility)
 ui.informed_check.stateChanged.connect(update_options_visibility)
 
@@ -60,7 +75,6 @@ def add_node():
     node1 = ui.node_1_input.text()
     node2 = ui.node_2_input.text()
     weight = ui.weight_input.text()
-    print(node1)
 
     if not node1.isalpha() or len(node1) != 1:
         show_error_message("Invalid Input for Node 1")
@@ -72,7 +86,6 @@ def add_node():
         show_error_message("Invalid Input for Weight")
         return
     
-    print(node1)
     
     weight = int(weight)
 
@@ -81,16 +94,18 @@ def add_node():
     ui.weight_input.clear()
 
     print(node1)
+    print(node2)
+    print(weight)
 
 #list for goal states
 goal_states = []
 
 def submit_states():
     goal = []
-    start = ui.start_node_input.text()
+    start_state = ui.start_node_input.text()
     goal = ui.goal_node_input.text()
 
-    if not start.isalpha() or len(start) != 1:
+    if not start_state.isalpha() or len(start_state) != 1:
         show_error_message("Invalid Input for Start State")
         return
     goal = goal.replace(" ", "")
@@ -100,6 +115,7 @@ def submit_states():
     
     goal_states.extend(list(goal))
 
+    print(start_state)
     print(goal_states)
 
     ui.start_node_input.clear()
