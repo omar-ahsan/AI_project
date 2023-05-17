@@ -7,6 +7,32 @@ main_window = QMainWindow()
 ui = gui.Ui_MainWindow()
 ui.setupUi(main_window)
 
+#Direction variable and function
+direction_selected = "Undirected Graph"
+
+def select_direction(index):
+    global direction_selected
+
+    new_direction = ui.direction_combo.itemText(index)
+
+    if direction_selected != "" and direction_selected != new_direction:
+        if not show_warning_message("Changing the direction will clear all nodes. Are you sure?"):
+            # User canceled, revert to previous direction
+            ui.direction_combo.setCurrentText(direction_selected)
+            return
+
+        # Clear all inputs and stored values
+        ui.node_1_input.clear()
+        ui.node_2_input.clear()
+        ui.weight_input.clear()
+        ui.start_node_input.clear()
+        ui.goal_node_input.clear()
+
+        # Clear the stored goal states
+        clear_variables()
+
+    direction_selected = new_direction
+
 # Hidden elements before check
 # Uninformed Search
 ui.uninformed_search_label.setVisible(False)
@@ -70,8 +96,11 @@ ui.informed_check.clicked.connect(handle_informed_check)
 ui.uninformed_check.stateChanged.connect(update_options_visibility)
 ui.informed_check.stateChanged.connect(update_options_visibility)
 
+
 #Function for Inputs
 def add_node():
+    global node1, node2, weight
+
     node1 = ui.node_1_input.text()
     node2 = ui.node_2_input.text()
     weight = ui.weight_input.text()
@@ -97,10 +126,11 @@ def add_node():
     print(node2)
     print(weight)
 
-#list for goal states
 goal_states = []
 
+# Function for start and goal state
 def submit_states():
+    global start_state
     goal = []
     start_state = ui.start_node_input.text()
     goal = ui.goal_node_input.text()
@@ -122,7 +152,41 @@ def submit_states():
     ui.goal_node_input.clear()
 
 
+#Function to add heuristics if informed is checked
+def add_heuristic():
+    global heuristic_value, heuristic_node
+    heuristic_node = ui.informed_node_input.text()
+    heuristic_value = ui.informed_heuristic_input.text()
 
+    if not heuristic_node.isalpha() or len(heuristic_node) != 1:
+        show_error_message("Invalid Input for Node 1")
+        return
+    if not heuristic_value.isdigit():
+        show_error_message("Invalid Input for Weight")
+        return
+    
+    heuristic_value = int(heuristic_value)
+
+    print(heuristic_node)
+    print(heuristic_value)
+
+    ui.informed_node_input.clear()
+    ui.informed_heuristic_input.clear()
+
+# Function to clear all inputs for changing of direction
+def clear_variables():
+    global node1, node2, weight, start_state, goal_states, heuristic_node, heuristic_value
+    node1 = ""
+    node2 = ""
+    weight = ""
+    start_state = ""
+    goal_states = []
+    heuristic_node = ""
+    heuristic_value = ""
+    print("Variables cleared")
+
+
+# Error msg for invalid input
 def show_error_message(message):
     msg_box = QMessageBox()
     msg_box.setIcon(QMessageBox.Icon.Critical)
@@ -130,8 +194,21 @@ def show_error_message(message):
     msg_box.setText(message)
     msg_box.exec()
 
+# Warning msg for changing of direction
+def show_warning_message(message):
+    msg_box = QMessageBox()
+    msg_box.setIcon(QMessageBox.Icon.Warning)
+    msg_box.setWindowTitle("Warning")
+    msg_box.setText(message)
+    msg_box.setStandardButtons(QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.Cancel)
+    return msg_box.exec() == QMessageBox.StandardButton.Yes
+
+
+
+ui.informed_heuristic_button.clicked.connect(add_heuristic)
 ui.add_node_button.clicked.connect(add_node)
 ui.submit_button.clicked.connect(submit_states)
+ui.direction_combo.currentIndexChanged.connect(select_direction)
 
 main_window.show()
 
