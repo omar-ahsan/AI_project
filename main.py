@@ -1,17 +1,22 @@
 import sys
 from PyQt6.QtWidgets import QApplication, QMainWindow, QMessageBox
 import gui
+import networkx as nx
+import matplotlib.pyplot as plt
 
 app = QApplication(sys.argv)
 main_window = QMainWindow()
 ui = gui.Ui_MainWindow()
 ui.setupUi(main_window)
 
+#Graph Variable
+graph = None
+
 #Direction variable and function
 direction_selected = "Undirected Graph"
 
 def select_direction(index):
-    global direction_selected
+    global direction_selected, graph
 
     new_direction = ui.direction_combo.itemText(index)
 
@@ -30,6 +35,8 @@ def select_direction(index):
 
         # Clear the stored goal states
         clear_variables()
+        # Clear the graph
+        graph = None
 
     direction_selected = new_direction
 
@@ -99,7 +106,7 @@ ui.informed_check.stateChanged.connect(update_options_visibility)
 
 #Function for Inputs
 def add_node():
-    global node1, node2, weight
+    global node1, node2, weight, graph
 
     node1 = ui.node_1_input.text()
     node2 = ui.node_2_input.text()
@@ -118,13 +125,59 @@ def add_node():
     
     weight = int(weight)
 
-    ui.node_1_input.clear()
-    ui.node_2_input.clear()
-    ui.weight_input.clear()
+    
 
     print(node1)
     print(node2)
     print(weight)
+
+    if graph is None:
+        if direction_selected == "Undirected Graph":
+            graph = nx.Graph()
+        else:
+            graph = nx.DiGraph()
+
+    graph.add_edge(node1, node2, weight=weight)
+
+    if direction_selected == "Undirected Graph":
+        graph.add_edge(node2, node1, weight=weight)
+
+    clear_graphics_view()
+    ui.node_1_input.clear()
+    ui.node_2_input.clear()
+    ui.weight_input.clear()
+
+def display_graph():
+    if graph is not None:
+        clear_graphics_view()
+        draw_graph()
+    else:
+        show_error_message("Graph is empty. Add nodes first")
+
+def draw_graph():
+    if graph is None:
+        show_error_message("Graph is empty. Add nodes first")
+        return
+
+    pos = nx.spring_layout(graph)
+
+    node_size = 200
+    node_color = "red"
+    node_font_color = "white"
+    edge_color = "black"
+
+    fig, ax = plt.subplots()
+    nx.draw_networkx_nodes(graph, pos, ax=ax, node_size=node_size, node_color=node_color, edgecolors="black")
+    nx.draw_networkx_labels(graph, pos, ax=ax, font_color=node_font_color)
+    nx.draw_networkx_edges(graph, pos, ax=ax, edge_color=edge_color)
+
+    edge_labels = nx.get_edge_attributes(graph, "weight")
+    nx.draw_networkx_edge_labels(graph, pos, edge_labels=edge_labels, ax=ax)
+
+    ax.axis("off")
+    plt.tight_layout()
+    plt.show()
+
 
 goal_states = []
 
@@ -185,6 +238,13 @@ def clear_variables():
     heuristic_value = ""
     print("Variables cleared")
 
+def clear_graphics_view():
+    scene = ui.graphicsView.scene()
+    if scene is not None:
+        items = scene.items()
+        for item in items:
+            scene.removeItem(item)
+
 
 # Error msg for invalid input
 def show_error_message(message):
@@ -209,6 +269,7 @@ ui.informed_heuristic_button.clicked.connect(add_heuristic)
 ui.add_node_button.clicked.connect(add_node)
 ui.submit_button.clicked.connect(submit_states)
 ui.direction_combo.currentIndexChanged.connect(select_direction)
+ui.graph_button.clicked.connect(display_graph)
 
 main_window.show()
 
