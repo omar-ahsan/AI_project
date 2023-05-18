@@ -13,6 +13,7 @@ from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
 import bfs
 import dfs
 import dls
+import ucs
 
 
 app = QApplication(sys.argv)
@@ -276,7 +277,7 @@ def generate_path():
 
     # Generate path based on search type and options
     if search_type == "Uninformed":
-        
+
         if uninformed_option == "Breadth First Search":
             path, path_graph = bfs.breadth_first_search(graph, start_state, goal_states)
             if path and path_graph:
@@ -302,6 +303,14 @@ def generate_path():
             depth = int(depth)
             print(depth)
             path, path_graph = dls.depth_limited_search(graph, start_state, goal_states, depth)
+            if path and path_graph:
+                print("Path: " , path)
+                initiate_path(path_graph)
+            else:
+                show_error_message("No path found")
+
+        if uninformed_option == "Uniform Cost Search":
+            path, path_graph = ucs.uniform_cost_search(graph, start_state, goal_states)
             if path and path_graph:
                 print("Path: " , path)
                 initiate_path(path_graph)
