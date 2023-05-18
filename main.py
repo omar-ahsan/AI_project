@@ -1,10 +1,13 @@
 import sys
-from PyQt6.QtWidgets import QApplication, QMainWindow, QMessageBox
+from PyQt6.QtWidgets import QApplication, QMainWindow, QMessageBox, QGraphicsScene
 import gui
 import networkx as nx
 import matplotlib.pyplot as plt
 from PyQt6.QtCore import Qt
 from networkx.drawing.nx_agraph import graphviz_layout
+from matplotlib.figure import Figure
+from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
+
 
 #Importing algorithms
 import bfs
@@ -111,40 +114,6 @@ ui.informed_check.clicked.connect(handle_informed_check)
 ui.uninformed_check.stateChanged.connect(update_options_visibility)
 ui.informed_check.stateChanged.connect(update_options_visibility)
 
-#--------------------------------------------Graph---------------------------------------#
-# Display graph function
-def display_graph():
-    if graph is not None:
-        clear_graph_view()
-        draw_graph()
-    else:
-        show_error_message("Graph is empty. Add nodes first")
-
-# Draw graph function
-def draw_graph():
-    if graph is None:
-        show_error_message("Graph is empty. Add nodes first")
-        return
-
-    pos = nx.spring_layout(graph)
-
-    node_size = 200
-    node_color = "red"
-    node_font_color = "white"
-    edge_color = "black"
-
-    fig, ax = plt.subplots()
-    nx.draw_networkx_nodes(graph, pos, ax=ax, node_size=node_size, node_color=node_color, edgecolors="black")
-    nx.draw_networkx_labels(graph, pos, ax=ax, font_color=node_font_color)
-    nx.draw_networkx_edges(graph, pos, ax=ax, edge_color=edge_color)
-
-    edge_labels = nx.get_edge_attributes(graph, "weight")
-    nx.draw_networkx_edge_labels(graph, pos, edge_labels=edge_labels, ax=ax)
-
-    ax.axis("off")
-    plt.tight_layout()
-    plt.show()
-
 #--------------------------------------------Input Boxes---------------------------------------#
 #Function for Inputs
 def add_node():
@@ -234,6 +203,37 @@ def add_heuristic():
     ui.informed_node_input.clear()
     ui.informed_heuristic_input.clear()
 
+
+#--------------------------------------------Graph---------------------------------------#
+# Display graph function
+def initiate_graph():
+    if graph is not None:
+        clear_graph_view()
+        connect_graph(draw_graph)
+    else:
+        show_error_message("Graph is empty. Add nodes first")
+
+# Draw graph function
+def draw_graph(fig):
+    pos = nx.spring_layout(graph)
+
+    node_size = 200
+    node_color = "red"
+    node_font_color = "white"
+    edge_color = "black"
+
+    ax = fig.add_subplot(111)
+    nx.draw_networkx_nodes(graph, pos, ax=ax, node_size=node_size, node_color=node_color, edgecolors="black")
+    nx.draw_networkx_labels(graph, pos, ax=ax, font_color=node_font_color)
+    nx.draw_networkx_edges(graph, pos, ax=ax, edge_color=edge_color)
+
+    edge_labels = nx.get_edge_attributes(graph, "weight")
+    nx.draw_networkx_edge_labels(graph, pos, edge_labels=edge_labels, ax=ax)
+
+    ax.axis("off")
+    plt.tight_layout()
+
+#--------------------------------------------Path---------------------------------------#
 # Function to check the selection of Informed or Uninformed search type and generate path according to it.
 def generate_path():
     search_type = ""
@@ -262,7 +262,7 @@ def generate_path():
             path, path_graph = bfs.breadth_first_search(graph, start_state, goal_states)
             if path and path_graph:
                 print("Path: " , path)
-                display_path(path_graph)
+                initiate_path(path_graph)
             else:
                 show_error_message("No path found")
         pass
@@ -270,15 +270,35 @@ def generate_path():
         # Generate path for informed search
         pass
 
-def display_path(path_graph):
+def initiate_path(path_graph):
     if path_graph is not None:
-        edge_labels = nx.get_edge_attributes(path_graph, 'weight')
-        pos = graphviz_layout(path_graph, prog='dot')
-        nx.draw(path_graph, pos, with_labels=True)
-        nx.draw_networkx_edge_labels(path_graph, pos, edge_labels=edge_labels)
-        plt.show()
+        connect_graph(lambda fig: draw_path(fig, path_graph))
     else:
-        print("No path found.")
+        show_error_message("No path found")
+
+def draw_path(fig, path_graph):
+    pos = graphviz_layout(path_graph, prog='dot')
+    edge_labels = nx.get_edge_attributes(path_graph, 'weight')
+
+    ax = fig.add_subplot(111)
+    nx.draw(path_graph, pos, with_labels=True, ax=ax)
+    nx.draw_networkx_edge_labels(path_graph, pos, edge_labels=edge_labels, ax=ax)
+
+
+#--------------------------------------------Graph View---------------------------------------#
+
+def connect_graph(draw_func):
+    fig = plt.figure()
+    # send an empty fig to draw_func
+    draw_func(fig)
+    # receive the fig and place it into canvas
+    canvas = FigureCanvas(fig)
+    # initiate a new scene
+    scene = QGraphicsScene()
+    # add the canvas into the scene
+    scene.addWidget(canvas)
+    # connect the graph_view object to scene
+    ui.graph_view.setScene(scene)
 
 #--------------------------------------------Clearing---------------------------------------#
 # Function to clear all inputs for changing of direction
@@ -326,7 +346,7 @@ ui.informed_heuristic_button.clicked.connect(add_heuristic)
 ui.add_node_button.clicked.connect(add_node)
 ui.submit_button.clicked.connect(submit_states)
 ui.direction_combo.currentIndexChanged.connect(select_direction)
-ui.graph_button.clicked.connect(display_graph)
+ui.graph_button.clicked.connect(initiate_graph)
 ui.path_button.clicked.connect(generate_path)
 
 main_window.show()
