@@ -190,8 +190,9 @@ goal_states = []
 
 # Function for start and goal state
 def submit_states():
-    global start_state
+    global start_state, goal_states
     goal = []
+    goal_states = []
     start_state = ui.start_node_input.text()
     goal = ui.goal_node_input.text()
 
