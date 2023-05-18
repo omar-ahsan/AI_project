@@ -3,6 +3,8 @@ from PyQt6.QtWidgets import QApplication, QMainWindow, QMessageBox
 import gui
 import networkx as nx
 import matplotlib.pyplot as plt
+from PyQt6.QtCore import Qt
+
 
 app = QApplication(sys.argv)
 main_window = QMainWindow()
@@ -177,7 +179,6 @@ def draw_graph():
     ax.axis("off")
     plt.tight_layout()
     plt.show()
-
 
 goal_states = []
 
