@@ -11,6 +11,7 @@ from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
 
 #Importing algorithms
 import bfs
+import dfs
 
 
 app = QApplication(sys.argv)
@@ -45,6 +46,8 @@ def select_direction(index):
 
         # Clear the stored goal states
         clear_variables()
+        # Clear graph view
+        clear_graph_view()
         # Clear the graph
         graph = None
 
@@ -260,6 +263,13 @@ def generate_path():
     if search_type == "Uninformed":
         if uninformed_option == "Breadth First Search":
             path, path_graph = bfs.breadth_first_search(graph, start_state, goal_states)
+            if path and path_graph:
+                print("Path: " , path)
+                initiate_path(path_graph)
+            else:
+                show_error_message("No path found")
+        if uninformed_option == "Depth First Search":
+            path, path_graph = dfs.depth_first_search(graph, start_state, goal_states)
             if path and path_graph:
                 print("Path: " , path)
                 initiate_path(path_graph)
