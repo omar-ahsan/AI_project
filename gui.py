@@ -426,6 +426,12 @@ class Ui_MainWindow(object):
         self.direction_label = QtWidgets.QLabel(parent=self.mainwindow)
         self.direction_label.setGeometry(QtCore.QRect(360, 30, 61, 17))
         self.direction_label.setObjectName("direction_label")
+        self.uninformed_depth_input = QtWidgets.QLineEdit(parent=self.mainwindow)
+        self.uninformed_depth_input.setGeometry(QtCore.QRect(40, 380, 113, 25))
+        self.uninformed_depth_input.setObjectName("uninformed_depth_input")
+        self.uninformed_depth_label = QtWidgets.QLabel(parent=self.mainwindow)
+        self.uninformed_depth_label.setGeometry(QtCore.QRect(40, 360, 54, 17))
+        self.uninformed_depth_label.setObjectName("uninformed_depth_label")
         MainWindow.setCentralWidget(self.mainwindow)
 
         self.retranslateUi(MainWindow)
@@ -464,3 +470,4 @@ class Ui_MainWindow(object):
         self.direction_combo.setItemText(0, _translate("MainWindow", "Undirected Graph"))
         self.direction_combo.setItemText(1, _translate("MainWindow", "Directed Graph"))
         self.direction_label.setText(_translate("MainWindow", "Direction"))
+        self.uninformed_depth_label.setText(_translate("MainWindow", "Depth"))

@@ -12,6 +12,7 @@ from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
 #Importing algorithms
 import bfs
 import dfs
+import dls
 
 
 app = QApplication(sys.argv)
@@ -58,6 +59,8 @@ def select_direction(index):
 # Uninformed Search
 ui.uninformed_search_label.setVisible(False)
 ui.uninformed_combo.setVisible(False)
+ui.uninformed_depth_label.setVisible(False)
+ui.uninformed_depth_input.setVisible(False)
 
 # Informed Search
 ui.informed_combo.setVisible(False)
@@ -70,16 +73,26 @@ ui.informed_node_label.setVisible(False)
 
 #Function to update visibility of some elements
 def update_options_visibility():
+    uninformed_option = ui.uninformed_combo.currentText()
 
     # For Uninformed
     if ui.uninformed_check.isChecked():
         ui.uninformed_search_label.setVisible(True)
         ui.uninformed_combo.setVisible(True)
+
+        if uninformed_option == "Depth Limited":
+            ui.uninformed_depth_label.setVisible(True)
+            ui.uninformed_depth_input.setVisible(True)
+        else:
+            ui.uninformed_depth_label.setVisible(False)
+            ui.uninformed_depth_input.setVisible(False)
         
 
     elif ui.uninformed_check.isCheckable(): 
         ui.uninformed_search_label.setVisible(False)
         ui.uninformed_combo.setVisible(False)
+        ui.uninformed_depth_label.setVisible(False)
+        ui.uninformed_depth_input.setVisible(False)
         
 
     # For Informed
@@ -106,6 +119,7 @@ def update_options_visibility():
 def handle_uninformed_check():
     ui.uninformed_check.setChecked(True)
     ui.informed_check.setChecked(False)
+    update_options_visibility()
 
 def handle_informed_check():
     ui.uninformed_check.setChecked(False)
@@ -116,6 +130,7 @@ ui.uninformed_check.clicked.connect(handle_uninformed_check)
 ui.informed_check.clicked.connect(handle_informed_check)
 ui.uninformed_check.stateChanged.connect(update_options_visibility)
 ui.informed_check.stateChanged.connect(update_options_visibility)
+ui.uninformed_combo.currentIndexChanged.connect(update_options_visibility)
 
 #--------------------------------------------Input Boxes---------------------------------------#
 #Function for Inputs
@@ -218,7 +233,7 @@ def initiate_graph():
 
 # Draw graph function
 def draw_graph(fig):
-    pos = nx.spring_layout(graph)
+    pos = graphviz_layout(graph, prog='dot')
 
     node_size = 200
     node_color = "red"
@@ -270,6 +285,20 @@ def generate_path():
                 show_error_message("No path found")
         if uninformed_option == "Depth First Search":
             path, path_graph = dfs.depth_first_search(graph, start_state, goal_states)
+            if path and path_graph:
+                print("Path: " , path)
+                initiate_path(path_graph)
+            else:
+                show_error_message("No path found")
+        if uninformed_option == "Depth Limited":
+            depth = ui.uninformed_depth_input.text()
+            if not depth.isdigit():
+                show_error_message("Invalid Input for Weight")
+                return
+
+            depth = int(depth)
+
+            path, path_graph = dls.depth_limited_search(graph, start_state, goal_states, depth)
             if path and path_graph:
                 print("Path: " , path)
                 initiate_path(path_graph)

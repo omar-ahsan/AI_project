@@ -1354,6 +1354,29 @@
      <string>Direction</string>
     </property>
    </widget>
+   <widget class="QLineEdit" name="uninformed_depth_input">
+    <property name="geometry">
+     <rect>
+      <x>40</x>
+      <y>380</y>
+      <width>113</width>
+      <height>25</height>
+     </rect>
+    </property>
+   </widget>
+   <widget class="QLabel" name="uninformed_depth_label">
+    <property name="geometry">
+     <rect>
+      <x>40</x>
+      <y>360</y>
+      <width>54</width>
+      <height>17</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Depth</string>
+    </property>
+   </widget>
   </widget>
  </widget>
  <resources/>
