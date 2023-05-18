@@ -4,6 +4,7 @@ import gui
 import networkx as nx
 import matplotlib.pyplot as plt
 from PyQt6.QtCore import Qt
+from networkx.drawing.nx_agraph import graphviz_layout
 
 #Importing algorithms
 import bfs
@@ -257,9 +258,10 @@ def generate_path():
     # Generate path based on search type and options
     if search_type == "Uninformed":
         if uninformed_option == "Breadth First Search":
-            path = bfs.breadth_first_search(graph, start_state, goal_states)
-            if path:
+            path, path_graph = bfs.breadth_first_search(graph, start_state, goal_states)
+            if path and path_graph:
                 print("Path: " , path)
+                display_path(path_graph)
             else:
                 show_error_message("No path found")
         pass
@@ -267,6 +269,15 @@ def generate_path():
         # Generate path for informed search
         pass
 
+def display_path(path_graph):
+    if path_graph is not None:
+        edge_labels = nx.get_edge_attributes(path_graph, 'weight')
+        pos = graphviz_layout(path_graph, prog='dot')
+        nx.draw(path_graph, pos, with_labels=True)
+        nx.draw_networkx_edge_labels(path_graph, pos, edge_labels=edge_labels)
+        plt.show()
+    else:
+        print("No path found.")
 
 #--------------------------------------------Clearing---------------------------------------#
 # Function to clear all inputs for changing of direction
