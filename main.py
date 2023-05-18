@@ -276,6 +276,7 @@ def generate_path():
 
     # Generate path based on search type and options
     if search_type == "Uninformed":
+        
         if uninformed_option == "Breadth First Search":
             path, path_graph = bfs.breadth_first_search(graph, start_state, goal_states)
             if path and path_graph:
@@ -283,6 +284,7 @@ def generate_path():
                 initiate_path(path_graph)
             else:
                 show_error_message("No path found")
+
         if uninformed_option == "Depth First Search":
             path, path_graph = dfs.depth_first_search(graph, start_state, goal_states)
             if path and path_graph:
@@ -290,14 +292,15 @@ def generate_path():
                 initiate_path(path_graph)
             else:
                 show_error_message("No path found")
+
         if uninformed_option == "Depth Limited":
             depth = ui.uninformed_depth_input.text()
             if not depth.isdigit():
-                show_error_message("Invalid Input for Weight")
+                show_error_message("Invalid Input for Depth")
                 return
 
             depth = int(depth)
-
+            print(depth)
             path, path_graph = dls.depth_limited_search(graph, start_state, goal_states, depth)
             if path and path_graph:
                 print("Path: " , path)
@@ -322,6 +325,8 @@ def draw_path(fig, path_graph):
     ax = fig.add_subplot(111)
     nx.draw(path_graph, pos, with_labels=True, ax=ax)
     nx.draw_networkx_edge_labels(path_graph, pos, edge_labels=edge_labels, ax=ax)
+
+    plt.tight_layout()
 
 
 #--------------------------------------------Graph View---------------------------------------#
