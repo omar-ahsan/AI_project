@@ -124,10 +124,7 @@ def add_node():
         show_error_message("Invalid Input for Weight")
         return
     
-    
     weight = int(weight)
-
-    
 
     print(node1)
     print(node2)
@@ -144,18 +141,21 @@ def add_node():
     if direction_selected == "Undirected Graph":
         graph.add_edge(node2, node1, weight=weight)
 
-    clear_graphics_view()
+    clear_graph_view()
     ui.node_1_input.clear()
     ui.node_2_input.clear()
     ui.weight_input.clear()
 
+
+# Display graph function
 def display_graph():
     if graph is not None:
-        clear_graphics_view()
+        clear_graph_view()
         draw_graph()
     else:
         show_error_message("Graph is empty. Add nodes first")
 
+# Draw graph function
 def draw_graph():
     if graph is None:
         show_error_message("Graph is empty. Add nodes first")
@@ -239,8 +239,9 @@ def clear_variables():
     heuristic_value = ""
     print("Variables cleared")
 
-def clear_graphics_view():
-    scene = ui.graphicsView.scene()
+# Clear graph view with reference to restrictions
+def clear_graph_view():
+    scene = ui.graph_view.scene()
     if scene is not None:
         items = scene.items()
         for item in items:
@@ -263,8 +264,6 @@ def show_warning_message(message):
     msg_box.setText(message)
     msg_box.setStandardButtons(QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.Cancel)
     return msg_box.exec() == QMessageBox.StandardButton.Yes
-
-
 
 ui.informed_heuristic_button.clicked.connect(add_heuristic)
 ui.add_node_button.clicked.connect(add_node)
