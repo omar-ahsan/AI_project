@@ -5,12 +5,16 @@ import networkx as nx
 import matplotlib.pyplot as plt
 from PyQt6.QtCore import Qt
 
+#Importing algorithms
+import bfs
+
 
 app = QApplication(sys.argv)
 main_window = QMainWindow()
 ui = gui.Ui_MainWindow()
 ui.setupUi(main_window)
 
+#--------------------------------------------Direction function---------------------------------------#
 #Graph Variable
 graph = None
 
@@ -42,6 +46,7 @@ def select_direction(index):
 
     direction_selected = new_direction
 
+#--------------------------------------------Visibility of elements---------------------------------------#
 # Hidden elements before check
 # Uninformed Search
 ui.uninformed_search_label.setVisible(False)
@@ -105,7 +110,41 @@ ui.informed_check.clicked.connect(handle_informed_check)
 ui.uninformed_check.stateChanged.connect(update_options_visibility)
 ui.informed_check.stateChanged.connect(update_options_visibility)
 
+#--------------------------------------------Graph---------------------------------------#
+# Display graph function
+def display_graph():
+    if graph is not None:
+        clear_graph_view()
+        draw_graph()
+    else:
+        show_error_message("Graph is empty. Add nodes first")
 
+# Draw graph function
+def draw_graph():
+    if graph is None:
+        show_error_message("Graph is empty. Add nodes first")
+        return
+
+    pos = nx.spring_layout(graph)
+
+    node_size = 200
+    node_color = "red"
+    node_font_color = "white"
+    edge_color = "black"
+
+    fig, ax = plt.subplots()
+    nx.draw_networkx_nodes(graph, pos, ax=ax, node_size=node_size, node_color=node_color, edgecolors="black")
+    nx.draw_networkx_labels(graph, pos, ax=ax, font_color=node_font_color)
+    nx.draw_networkx_edges(graph, pos, ax=ax, edge_color=edge_color)
+
+    edge_labels = nx.get_edge_attributes(graph, "weight")
+    nx.draw_networkx_edge_labels(graph, pos, edge_labels=edge_labels, ax=ax)
+
+    ax.axis("off")
+    plt.tight_layout()
+    plt.show()
+
+#--------------------------------------------Input Boxes---------------------------------------#
 #Function for Inputs
 def add_node():
     global node1, node2, weight, graph
@@ -145,40 +184,6 @@ def add_node():
     ui.node_1_input.clear()
     ui.node_2_input.clear()
     ui.weight_input.clear()
-
-
-# Display graph function
-def display_graph():
-    if graph is not None:
-        clear_graph_view()
-        draw_graph()
-    else:
-        show_error_message("Graph is empty. Add nodes first")
-
-# Draw graph function
-def draw_graph():
-    if graph is None:
-        show_error_message("Graph is empty. Add nodes first")
-        return
-
-    pos = nx.spring_layout(graph)
-
-    node_size = 200
-    node_color = "red"
-    node_font_color = "white"
-    edge_color = "black"
-
-    fig, ax = plt.subplots()
-    nx.draw_networkx_nodes(graph, pos, ax=ax, node_size=node_size, node_color=node_color, edgecolors="black")
-    nx.draw_networkx_labels(graph, pos, ax=ax, font_color=node_font_color)
-    nx.draw_networkx_edges(graph, pos, ax=ax, edge_color=edge_color)
-
-    edge_labels = nx.get_edge_attributes(graph, "weight")
-    nx.draw_networkx_edge_labels(graph, pos, edge_labels=edge_labels, ax=ax)
-
-    ax.axis("off")
-    plt.tight_layout()
-    plt.show()
 
 goal_states = []
 
@@ -227,6 +232,43 @@ def add_heuristic():
     ui.informed_node_input.clear()
     ui.informed_heuristic_input.clear()
 
+# Function to check the selection of Informed or Uninformed search type and generate path according to it.
+def generate_path():
+    search_type = ""
+
+    if ui.uninformed_check.isChecked():
+        search_type = "Uninformed"
+        uninformed_option = ui.uninformed_combo.currentText()
+        print("Uninformed Search Type:", uninformed_option)
+
+    elif ui.informed_check.isChecked():
+        search_type = "Informed"
+        informed_option = ui.informed_combo.currentText()
+        print("Informed Search Type:", informed_option)
+    
+    if search_type == "":
+        show_error_message("Please select a search type")
+        return
+
+    if graph is None or len(graph.nodes) == 0:
+        show_error_message("Graph is empty. Add nodes first")
+        return
+
+    # Generate path based on search type and options
+    if search_type == "Uninformed":
+        if uninformed_option == "Breadth First Search":
+            path = bfs.breadth_first_search(graph, start_state, goal_states)
+            if path:
+                print("Path: " , path)
+            else:
+                show_error_message("No path found")
+        pass
+    elif search_type == "Informed":
+        # Generate path for informed search
+        pass
+
+
+#--------------------------------------------Clearing---------------------------------------#
 # Function to clear all inputs for changing of direction
 def clear_variables():
     global node1, node2, weight, start_state, goal_states, heuristic_node, heuristic_value
@@ -248,6 +290,7 @@ def clear_graph_view():
             scene.removeItem(item)
 
 
+#--------------------------------------------Error/Warning Box---------------------------------------#
 # Error msg for invalid input
 def show_error_message(message):
     msg_box = QMessageBox()
@@ -265,11 +308,14 @@ def show_warning_message(message):
     msg_box.setStandardButtons(QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.Cancel)
     return msg_box.exec() == QMessageBox.StandardButton.Yes
 
+
+#--------------------------------------------Connects---------------------------------------#
 ui.informed_heuristic_button.clicked.connect(add_heuristic)
 ui.add_node_button.clicked.connect(add_node)
 ui.submit_button.clicked.connect(submit_states)
 ui.direction_combo.currentIndexChanged.connect(select_direction)
 ui.graph_button.clicked.connect(display_graph)
+ui.path_button.clicked.connect(generate_path)
 
 main_window.show()
 
