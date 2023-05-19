@@ -14,6 +14,8 @@ import bfs
 import dfs
 import dls
 import ucs
+import bds
+import ids
 
 
 app = QApplication(sys.argv)
@@ -81,7 +83,7 @@ def update_options_visibility():
         ui.uninformed_search_label.setVisible(True)
         ui.uninformed_combo.setVisible(True)
 
-        if uninformed_option == "Depth Limited":
+        if uninformed_option == "Depth Limited" or uninformed_option == "Iterative Deepening":
             ui.uninformed_depth_label.setVisible(True)
             ui.uninformed_depth_input.setVisible(True)
         else:
@@ -316,6 +318,30 @@ def generate_path():
                 initiate_path(path_graph)
             else:
                 show_error_message("No path found")
+
+        if uninformed_option == "Iterative Deepening":
+            depth = ui.uninformed_depth_input.text()
+            if not depth.isdigit():
+                show_error_message("Invalid Input for Depth")
+                return
+
+            depth = int(depth)
+            print(depth)
+            path, path_graph = ids.iterative_deepening_search(graph, start_state, goal_states, depth)
+            if path and path_graph:
+                print("Path: " , path)
+                initiate_path(path_graph)
+            else:
+                show_error_message("No path found") 
+
+        if uninformed_option == "Bidirectional Search":
+            path, path_graph = bds.bidirectional_search(graph, start_state, goal_states)
+            if path and path_graph:
+                print("Path: ", path)
+                initiate_path(path_graph)
+            else:
+                show_error_message("No path found")
+
         pass
     elif search_type == "Informed":
         # Generate path for informed search
