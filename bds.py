@@ -13,7 +13,10 @@ def bidirectional_search(graph, start, goals):
     visited_backward.add(goals[0])
 
     traversal_path = []  # Store the complete traversal path
-    path_graph = nx.Graph()  # Create an empty graph to store the path
+
+    is_directed = graph.is_directed()
+
+    path_graph = nx.DiGraph() if is_directed else nx.Graph()  # Create an empty directed/undirected graph
 
     meeting_node = None  # Initialize meeting_node to None
 
@@ -70,6 +73,8 @@ def bidirectional_search(graph, start, goals):
             target = combined_path[i + 1]
             weight = graph.get_edge_data(source, target)['weight']
             path_graph.add_edge(source, target, weight=weight)
+            if not is_directed:
+                path_graph.add_edge(target, source, weight=weight)  # Add the reverse edge for undirected graphs
         return traversal_path, path_graph.subgraph(traversal_path)  # Return the complete traversal path and the subgraph
 
     # If goal node is not found, return None or a custom value
