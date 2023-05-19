@@ -431,6 +431,7 @@ def clear_variables():
     goal_states = []
     heuristic_node = ""
     heuristic_value = ""
+    ui.path_line_box.setText("")
     print("Variables cleared")
 
 # Clear graph view with reference to restrictions
