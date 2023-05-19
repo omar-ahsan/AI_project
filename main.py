@@ -17,6 +17,7 @@ import ucs
 import bds
 import ids
 import astar
+import bestfs
 
 
 app = QApplication(sys.argv)
@@ -363,6 +364,17 @@ def generate_path():
             heuristic = lambda state: heuristics_dict.get(state, float('inf'))
             print(heuristic)
             path, path_graph = astar.a_star_search(graph, start_state, goal_states, heuristic)
+            if path and path_graph:
+                print("Path: " , path)
+                write_path(path)
+                initiate_path(path_graph)
+            else:
+                show_error_message("No path found")
+
+        if informed_option == "Best First":
+            heuristic = lambda state: heuristics_dict.get(state, float('inf'))
+            print(heuristic)
+            path, path_graph = bestfs.best_first_search(graph, start_state, goal_states, heuristic)
             if path and path_graph:
                 print("Path: " , path)
                 write_path(path)

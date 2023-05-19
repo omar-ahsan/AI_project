@@ -1,16 +1,16 @@
 import networkx as nx
 import heapq
 
-def a_star_search(graph, start_state, goal_states, heuristic):
+def best_first_search(graph, start_state, goal_states, heuristic):
     visited = set()
-    queue = [(0, start_state, [])]  # (total_cost, current_node, path)
+    queue = [(heuristic(start_state), start_state, [])]  # (heuristic_value, current_node, path)
 
     traversal_path = []  # Store the complete traversal path
     path_graph = nx.Graph()  # Create an empty graph to store the path
     path_graph.add_node(start_state)  # Add the start node to the traversal graph
 
     while queue:
-        total_cost, current_state, path = heapq.heappop(queue)
+        _, current_state, path = heapq.heappop(queue)
 
         if current_state in visited:
             continue
@@ -32,9 +32,10 @@ def a_star_search(graph, start_state, goal_states, heuristic):
             neighbors = graph[current_state]
             for neighbor_state, edge_data in neighbors.items():
                 if neighbor_state not in visited:
-                    neighbor_cost = total_cost + edge_data['weight']
-                    priority = neighbor_cost + heuristic(neighbor_state)
+                    priority = heuristic(neighbor_state)
                     heapq.heappush(queue, (priority, neighbor_state, path[:]))
                     path_graph.add_edge(current_state, neighbor_state, weight=edge_data['weight'])  # Add the edge to the traversal graph
 
     return None, None  # No path found, return an empty path and empty graph
+
+
