@@ -6,8 +6,10 @@ def uniform_cost_search(graph, start, goals):
     visited = set()
     priority_queue = [(0, start, [])]  # (total_cost, current_node, path)
 
+    is_directed = graph.is_directed()
+
     traversal_path = []  # Store the complete traversal path
-    path_graph = nx.Graph()  # Create an empty graph to store the path
+    path_graph = nx.DiGraph() if is_directed else nx.Graph()  # Create an empty directed/undirected graph
     path_graph.add_node(start)  # Add the start node to the traversal graph
 
     while priority_queue:
@@ -27,6 +29,8 @@ def uniform_cost_search(graph, start, goals):
                 target = path[i + 1]
                 weight = graph.get_edge_data(source, target)['weight']
                 path_graph.add_edge(source, target, weight=weight)
+                if not is_directed:
+                    path_graph.add_edge(target, source, weight=weight)  # Add the reverse edge for undirected graphs
             return path, path_graph.subgraph(path)  # Return the path and the subgraph
 
         if current_node in graph:
@@ -36,5 +40,7 @@ def uniform_cost_search(graph, start, goals):
                     weight = graph.get_edge_data(current_node, neighbor)['weight']
                     heapq.heappush(priority_queue, (cost + weight, neighbor, path[:]))
                     path_graph.add_edge(current_node, neighbor, weight=weight)  # Add the edge to the traversal graph
+                    if not is_directed:
+                        path_graph.add_edge(neighbor, current_node, weight=weight)  # Add the reverse edge for undirected graphs
 
     return None, None  # No path found, return an empty path and empty graph
