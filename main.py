@@ -16,6 +16,7 @@ import dls
 import ucs
 import bds
 import ids
+import astar
 
 
 app = QApplication(sys.argv)
@@ -203,9 +204,11 @@ def submit_states():
     ui.goal_node_input.clear()
 
 
+heuristics_dict = {}
+
 #Function to add heuristics if informed is checked
 def add_heuristic():
-    global heuristic_value, heuristic_node
+    global heuristic_value, heuristic_node, heuristics_dict
     heuristic_node = ui.informed_node_input.text()
     heuristic_value = ui.informed_heuristic_input.text()
 
@@ -215,11 +218,15 @@ def add_heuristic():
     if not heuristic_value.isdigit():
         show_error_message("Invalid Input for Weight")
         return
-    
+
     heuristic_value = int(heuristic_value)
 
     print(heuristic_node)
     print(heuristic_value)
+    
+
+    heuristics_dict[heuristic_node] = int(heuristic_value)
+    print(heuristics_dict)
 
     ui.informed_node_input.clear()
     ui.informed_heuristic_input.clear()
@@ -257,6 +264,7 @@ def draw_graph(fig):
 #--------------------------------------------Path---------------------------------------#
 # Function to check the selection of Informed or Uninformed search type and generate path according to it.
 def generate_path():
+    global heuristics_dict
     search_type = ""
 
     if ui.uninformed_check.isChecked():
@@ -284,6 +292,7 @@ def generate_path():
             path, path_graph = bfs.breadth_first_search(graph, start_state, goal_states)
             if path and path_graph:
                 print("Path: " , path)
+                write_path(path)
                 initiate_path(path_graph)
             else:
                 show_error_message("No path found")
@@ -292,6 +301,7 @@ def generate_path():
             path, path_graph = dfs.depth_first_search(graph, start_state, goal_states)
             if path and path_graph:
                 print("Path: " , path)
+                write_path(path)
                 initiate_path(path_graph)
             else:
                 show_error_message("No path found")
@@ -307,6 +317,7 @@ def generate_path():
             path, path_graph = dls.depth_limited_search(graph, start_state, goal_states, depth)
             if path and path_graph:
                 print("Path: " , path)
+                write_path(path)
                 initiate_path(path_graph)
             else:
                 show_error_message("No path found")
@@ -315,6 +326,7 @@ def generate_path():
             path, path_graph = ucs.uniform_cost_search(graph, start_state, goal_states)
             if path and path_graph:
                 print("Path: " , path)
+                write_path(path)
                 initiate_path(path_graph)
             else:
                 show_error_message("No path found")
@@ -330,6 +342,7 @@ def generate_path():
             path, path_graph = ids.iterative_deepening_search(graph, start_state, goal_states, depth)
             if path and path_graph:
                 print("Path: " , path)
+                write_path(path)
                 initiate_path(path_graph)
             else:
                 show_error_message("No path found") 
@@ -338,13 +351,24 @@ def generate_path():
             path, path_graph = bds.bidirectional_search(graph, start_state, goal_states)
             if path and path_graph:
                 print("Path: ", path)
+                write_path(path)
                 initiate_path(path_graph)
             else:
                 show_error_message("No path found")
 
         pass
     elif search_type == "Informed":
-        # Generate path for informed search
+
+        if informed_option == "A*":
+            heuristic = lambda state: heuristics_dict.get(state, float('inf'))
+            print(heuristic)
+            path, path_graph = astar.a_star_search(graph, start_state, goal_states, heuristic)
+            if path and path_graph:
+                print("Path: " , path)
+                write_path(path)
+                initiate_path(path_graph)
+            else:
+                show_error_message("No path found")
         pass
 
 def initiate_path(path_graph):
@@ -362,6 +386,11 @@ def draw_path(fig, path_graph):
     nx.draw_networkx_edge_labels(path_graph, pos, edge_labels=edge_labels, ax=ax)
 
     plt.tight_layout()
+
+def write_path(path):
+    path_str = ' -> '.join(path)  # Convert the list of nodes to a string
+    print(path_str)
+    ui.path_line_box.setText(path_str)  # Set the text of the path_box to the generated path
 
 
 #--------------------------------------------Graph View---------------------------------------#
